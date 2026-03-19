@@ -1,89 +1,84 @@
 package rl.business;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.stream.Collectors;
 
 import rl.entity.Book;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LibraryBusiness {
     private static LibraryBusiness instance;
     private List<Book> books;
-    private LibraryBusiness(){
-        books =  new ArrayList<>();
+    private LibraryBusiness() {
+        books = new ArrayList<>();
     }
 
-    public static LibraryBusiness getInstance(){
-        if (instance == null){
+    public static LibraryBusiness getInstance() {
+        if (instance == null) {
             instance = new LibraryBusiness();
         }
         return instance;
     }
 
-    public void displayBooks(){
-        if (books.isEmpty()){
-            System.out.println("Danh sách rỗng");
+    public void displayBooks() {
+        if (books.isEmpty()) {
+            System.out.println("Danh sách rỗng!");
         } else {
-            books.forEach(System.out::println);
+            books.forEach(Book::displayData);
         }
     }
 
-    public void addBook(Book book){
-        boolean exists = books.stream().anyMatch(b -> b.getBookID().equals(book.getBookID()));
-        if (exists){
+    public void addBook(Book book) {
+        if (books.stream().anyMatch(b -> b.getBookId().equals(book.getBookId()))) {
             System.out.println("Mã sách đã tồn tại");
-        } else  {
-            books.add(book);
-            System.out.println("Thêm sách thành công");
-        }
-    }
-
-    public void updateBook(String id, Scanner scanner){
-        Optional<Book> opt = books.stream().filter(b -> b.getBookID().equals(id)).findFirst();
-        if (opt.isPresent()){
-            Book book = opt.get();
-            System.out.print("Nhập tên sách mới: ");
-            String name =  scanner.nextLine();
-            if (!name.isEmpty())
-                book.setBookName(name);
-
-            System.out.print("Nhập tác giả mới: ");
-            String author =  scanner.nextLine();
-            if (!author.isEmpty())
-                book.setAuthor(author);
-
-            System.out.println("Cập nhật thành công");
         } else {
-            System.out.println("Mã sách không tồn tại");
+            books.add(book);
+            System.out.println("Thêm thành công");
         }
     }
 
-    public void deleteBook(String id){
-        Optional<Book> opt = books.stream().filter(b -> b.getBookID().equals(id)).findFirst();
-        if (opt.isPresent()){
-            if (opt.get().isAvailable()){
-                books.remove(opt.get());
+    public void updateBook(String id, Scanner sc) {
+        Optional<Book> opt = books.stream().filter(b -> b.getBookId().equals(id)).findFirst();
+        if (opt.isPresent()) {
+            Book book = opt.get();
+            System.out.print("Tên sách (Enter để bỏ qua): ");
+            String name = sc.nextLine();
+            if (!name.isEmpty()) book.setBookName(name);
+
+            System.out.print("Tác giả (Enter để bỏ qua): ");
+            String author = sc.nextLine();
+            if (!author.isEmpty()) book.setAuthor(author);
+
+            System.out.println("Cập nhật thành công!");
+        } else {
+            System.out.println("Mã sách không tồn tại!");
+        }
+    }
+
+    public void deleteBook(String id) {
+        Optional<Book> opt = books.stream().filter(b -> b.getBookId().equals(id)).findFirst();
+        if (opt.isPresent()) {
+            Book book = opt.get();
+            if (book.isAvailable()) {
+                books.remove(book);
                 System.out.println("Xóa thành công");
             } else {
-                System.out.println("Chỉ xóa được sách còn trong kho");
+                System.out.println("Chỉ xóa được sách đang ở kho");
             }
         } else {
             System.out.println("Mã sách không tồn tại");
         }
     }
 
-    public void searchByAuthor(String keyword){
+    public void searchByAuthor(String keyword) {
         List<Book> result = books.stream()
                 .filter(b -> b.getAuthor().toLowerCase().contains(keyword.toLowerCase()))
                 .collect(Collectors.toList());
-        if (result.isEmpty()){
-            System.out.println("Không tìm thấy sách nào của tác giả chứa từ khóa: " + keyword);
-        } else {
-            result.forEach(Book::displayData);
-            System.out.println("Tổng số tìm thấy: " + result.size());
-        }
+        result.forEach(Book::displayData);
+        System.out.println("Tìm thấy: " + result.size() + " sách");
     }
 
-
+    public void sortByYearDesc() {
+        books.stream()
+                .sorted((b1, b2) -> Integer.compare(b2.getYear(), b1.getYear()))
+                .forEach(Book::displayData);
+    }
 }

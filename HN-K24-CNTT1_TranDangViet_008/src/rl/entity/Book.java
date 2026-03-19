@@ -1,9 +1,9 @@
 package rl.entity;
-import java.time.Year;
+
 import java.util.Scanner;
 
 public class Book {
-    private String bookID;
+    private String bookId;
     private String bookName;
     private String author;
     private int year;
@@ -13,8 +13,8 @@ public class Book {
     public Book() {
     }
 
-    public Book(String bookID, String bookName, String author, int year, String description, boolean isAvailable) {
-        this.bookID = bookID;
+    public Book(String bookId, String bookName, String author, int year, String description, boolean isAvailable) {
+        this.bookId = bookId;
         this.bookName = bookName;
         this.author = author;
         this.year = year;
@@ -22,12 +22,12 @@ public class Book {
         this.isAvailable = isAvailable;
     }
 
-    public String getBookID() {
-        return bookID;
+    public String getBookId() {
+        return bookId;
     }
 
-    public void setBookID(String bookID) {
-        this.bookID = bookID;
+    public void setBookId(String bookId) {
+        this.bookId = bookId;
     }
 
     public String getBookName() {
@@ -44,6 +44,7 @@ public class Book {
 
     public void setAuthor(String author) {
         this.author = author;
+
     }
 
     public int getYear() {
@@ -70,55 +71,35 @@ public class Book {
         isAvailable = available;
     }
 
-    public void inputData(Scanner scanner) {
-        while (true) {
-            System.out.print("Nhập mã sách: ");
-            String id = scanner.nextLine();
-            bookID = scanner.nextLine();
-            if (id.matches("B\\d{3}")){
-                this.bookID = bookID;
-                break;
-            } else {
-                System.out.println("Mã sách không hợp lệ");
-            }
-        }
+    public void inputData(Scanner sc) {
+        do {
+            System.out.print("Nhập mã sách (Bxxx): ");
+            bookId = sc.nextLine();
+        } while (!bookId.matches("B\\d{3}"));
 
-        do{
-            System.out.print("Nhập tên sách (Ký tự > 5): ");
-            this.bookName = scanner.nextLine();
-        } while (bookName.length() > 5);
+        do {
+            System.out.print("Nhập tên sách (>5 ký tự): ");
+            bookName = sc.nextLine();
+        } while (bookName.length() < 5);
 
         do {
             System.out.print("Nhập tác giả: ");
-            this.author = scanner.nextLine();
-        } while (author.trim().isEmpty());
+            author = sc.nextLine();
+        } while (author.isEmpty());
 
-        while(true){
-            System.out.print("Nhập năm xuất bản: ");
-            try {
-                int y= Integer.parseInt(scanner.nextLine());
-                int currentYear = Year.now().getValue();
-                if (y > 1900 && y <= currentYear){
-                    this.year = y;
-                    break;
-                } else {
-                    System.out.println("Năm xuất bản phải > 1900 và <= bằng" + currentYear);
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Phải nhập số hợp lệ");
-            }
-        }
+        do {
+            System.out.print("Nhập năm xuất bản (>1900, <=2026): ");
+            year = Integer.parseInt(sc.nextLine());
+        } while (year <= 1900 || year > 2026);
 
         System.out.print("Nhập mô tả: ");
-        this.description = scanner.nextLine();
-
-        System.out.print("Trạng thái (true: có sẵn, false: đang mượn");
-        this.isAvailable = Boolean.parseBoolean(scanner.nextLine());
+        description = sc.nextLine();
+        System.out.print("Trạng thái (true: có sẵn, false: đang mượn): ");
+        isAvailable = Boolean.parseBoolean(sc.nextLine());
     }
 
-    public void displayData(){
-        System.out.printf("| %-5s | %-20s | %-15s | %-4d | %-30s | %-10s |\n",bookID,bookName,author,year,description,isAvailable ? "Có sẵn" : "Đang mượn");
+    public void displayData() {
+        String status = isAvailable ? "Có sẵn" : "Đang mượn";
+        System.out.println(bookId + " | " + bookName + " | " + author + " | " + year + " | " + description + " | " + status);
     }
-
-
 }
